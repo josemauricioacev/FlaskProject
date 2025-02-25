@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "db"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database_student.sql:/docker-entrypoint-initdb.d/database_student.sql
+
+  pythonapp:
+    build: .
+    depends_on:
+      - mysql
+    ports:
+      - "4000:5000"
+    volumes:
+      - .:/app
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+    command: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+
+volumes:
+  mysql_data:
